@@ -5,6 +5,13 @@ En statisk Cloud247-webapp for å konvertere mellom:
 - Microsoft Entra Object ID (GUID)
 - Windows SID-formatet `S-1-12-1-x-x-x-x`
 
+- For å finne Object ID på en Tenant start powershell og koble til graph api.
+
+- connect-graph
+
+- #Lister alle entra roller på tenanten med Object id som kan konverteres:
+- Get-MgRoleManagementDirectoryRoleDefinition 
+
 ## Funksjoner
 
 - Object ID → SID
