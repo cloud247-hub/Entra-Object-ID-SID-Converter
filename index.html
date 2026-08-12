@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entra Object ID ↔ SID Converter | Cloud247</title>
+  <meta name="description" content="Konverter mellom Microsoft Entra Object ID (GUID) og Windows SID-formatet S-1-12-1. Alt behandles lokalt i nettleseren.">
+  <meta name="theme-color" content="#061a2f">
+  <meta property="og:title" content="Entra Object ID ↔ SID Converter">
+  <meta property="og:description" content="En rask og lokal konverterer for Microsoft Entra Object ID og S-1-12-1 SID.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="./assets/cloud247-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./converter-core.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#converter">Gå til konvertereren</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="https://cloud247.no/" aria-label="Cloud247 forside">
+        <img src="./assets/cloud247-mark.svg" alt="" width="38" height="38">
+        <span>Cloud247</span>
+      </a>
+      <nav class="main-nav" aria-label="Hovedmeny">
+        <a href="#converter">Konverter</a>
+        <a href="#how-it-works">Slik fungerer det</a>
+        <a href="#powershell">PowerShell</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">MICROSOFT ENTRA-VERKTØY</p>
+          <h1>Object ID <span aria-hidden="true">↔</span> SID Converter</h1>
+          <p class="hero-lead">
+            Konverter mellom en Microsoft Entra Object ID (GUID) og Windows-formatet
+            <code>S-1-12-1</code> — direkte i nettleseren, uten innlogging eller opplasting.
+          </p>
+          <div class="trust-row" aria-label="Egenskaper">
+            <span><strong>100 % lokalt</strong> Ingen data sendes</span>
+            <span><strong>Begge veier</strong> GUID og SID</span>
+            <span><strong>GitHub Pages</strong> Ingen backend</span>
+          </div>
+        </div>
+        <div class="hero-mark" aria-hidden="true">
+          <div class="hero-mark-inner">
+            <span class="hero-guid">73d664e4</span>
+            <span class="hero-arrow">↕</span>
+            <span class="hero-sid">S-1-12-1</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="converter-section" id="converter">
+      <div class="container">
+        <div class="converter-card">
+          <div class="converter-heading">
+            <div>
+              <p class="eyebrow">KONVERTER</p>
+              <h2>Lim inn en verdi</h2>
+              <p>Velg retning, skriv inn verdien og kopier resultatet.</p>
+            </div>
+            <span class="local-badge">Behandles lokalt</span>
+          </div>
+
+          <div class="direction-switch" role="group" aria-label="Velg konverteringsretning">
+            <button class="direction-button is-active" type="button" data-mode="object-to-sid" aria-pressed="true">
+              Object ID <span aria-hidden="true">→</span> SID
+            </button>
+            <button class="direction-button" type="button" data-mode="sid-to-object" aria-pressed="false">
+              SID <span aria-hidden="true">→</span> Object ID
+            </button>
+          </div>
+
+          <form id="converter-form" novalidate>
+            <div class="field-group">
+              <div class="field-label-row">
+                <label for="source-input" id="source-label">Microsoft Entra Object ID</label>
+                <button class="text-button" id="example-button" type="button">Bruk eksempel</button>
+              </div>
+              <input
+                id="source-input"
+                class="value-input"
+                type="text"
+                inputmode="text"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                placeholder="73d664e4-0886-4a73-9731-8146e010541d"
+                aria-describedby="source-help source-error">
+              <div class="field-meta">
+                <p id="source-help">Et GUID med 32 heksadesimale tegn. Bindestreker og klammeparenteser er valgfrie.</p>
+                <p class="field-error" id="source-error" role="alert" aria-live="polite"></p>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button class="primary-button" type="submit">
+                Konverter
+                <span aria-hidden="true">→</span>
+              </button>
+              <button class="secondary-button" id="swap-button" type="button" title="Bytt retning">
+                <span aria-hidden="true">⇄</span>
+                Bytt retning
+              </button>
+              <button class="secondary-button" id="clear-button" type="button">Tøm</button>
+            </div>
+          </form>
+
+          <div class="result-panel" id="result-panel" data-state="empty">
+            <div class="result-heading">
+              <div>
+                <span class="result-kicker">RESULTAT</span>
+                <h3 id="result-label">Windows SID</h3>
+              </div>
+              <span class="result-status" id="result-status">Venter på verdi</span>
+            </div>
+            <div class="result-value-row">
+              <output id="result-output" class="result-output" for="source-input">Resultatet vises her</output>
+              <button class="copy-button" id="copy-result-button" type="button" disabled>
+                Kopier
+              </button>
+            </div>
+            <p class="result-note" id="result-note">
+              Kun SID-er med prefikset <code>S-1-12-1</code> og fire 32-bits delverdier kan konverteres tilbake til et Object ID.
+            </p>
+          </div>
+        </div>
+
+        <details class="batch-card">
+          <summary>
+            <span>
+              <strong>Massekonvertering</strong>
+              <small>Én verdi per linje, opptil 250 verdier</small>
+            </span>
+            <span class="summary-icon" aria-hidden="true">+</span>
+          </summary>
+          <div class="batch-body">
+            <label for="batch-input">Verdier</label>
+            <textarea id="batch-input" rows="7" spellcheck="false" placeholder="Lim inn én verdi per linje"></textarea>
+            <div class="action-row compact">
+              <button class="primary-button" id="batch-convert-button" type="button">Konverter alle</button>
+              <button class="secondary-button" id="batch-copy-button" type="button" disabled>Kopier resultater</button>
+              <button class="secondary-button" id="batch-download-button" type="button" disabled>Last ned CSV</button>
+            </div>
+            <p class="batch-message" id="batch-message" aria-live="polite"></p>
+            <div class="table-wrap" id="batch-table-wrap" hidden>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nr.</th>
+                    <th>Input</th>
+                    <th>Resultat</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="batch-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="info-section" id="how-it-works">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">SLIK FUNGERER DET</p>
+          <h2>Samme byte-rekkefølge som .NET</h2>
+          <p>
+            Verktøyet følger samme prinsipp som Microsofts PowerShell-eksempel: GUID-en leses som 16 byte,
+            deles i fire usignerte 32-bits heltall og får SID-prefikset <code>S-1-12-1</code>.
+          </p>
+        </div>
+
+        <div class="steps-grid">
+          <article class="step-card">
+            <span class="step-number">01</span>
+            <h3>Les GUID</h3>
+            <p>Object ID valideres og normaliseres til standard GUID-format.</p>
+          </article>
+          <article class="step-card">
+            <span class="step-number">02</span>
+            <h3>Del i fire tall</h3>
+            <p>De 16 bytene tolkes som fire little-endian <code>UInt32</code>-verdier.</p>
+          </article>
+          <article class="step-card">
+            <span class="step-number">03</span>
+            <h3>Bygg SID</h3>
+            <p>Delverdiene settes etter prefikset <code>S-1-12-1</code>.</p>
+          </article>
+        </div>
+
+        <div class="example-flow" aria-label="Eksempel på konvertering">
+          <code>73d664e4-0886-4a73-9731-8146e010541d</code>
+          <span aria-hidden="true">→</span>
+          <code>S-1-12-1-1943430372-1249052806-1182871959-492048608</code>
+        </div>
+
+        <div class="notice-grid">
+          <aside class="notice-card">
+            <h3>Viktig avgrensning</h3>
+            <p>
+              Dette er en deterministisk formatkonvertering. Verktøyet kobler ikke til Microsoft Graph og bekrefter
+              derfor ikke om objektet eksisterer, hvilken type objekt det er eller om det fortsatt er aktivt.
+            </p>
+          </aside>
+          <aside class="notice-card warning">
+            <h3>Ikke et on-premises objectSid</h3>
+            <p>
+              En <code>S-1-12-1</code>-SID er ikke det samme som en tradisjonell Active Directory-SID eller verdien i
+              <code>onPremisesSecurityIdentifier</code>. Andre SID-formater kan ikke konverteres med denne metoden.
+            </p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="powershell-section" id="powershell">
+      <div class="container powershell-grid">
+        <div class="powershell-copy">
+          <p class="eyebrow">POWERSHELL</p>
+          <h2>Bruk samme konvertering i terminalen</h2>
+          <p>
+            Last ned et PowerShell-script med funksjoner for begge retninger. Scriptet krever ingen Microsoft Graph-modul
+            og gjør kun lokal konvertering.
+          </p>
+          <div class="download-row">
+            <a class="primary-button as-link" href="./scripts/Convert-EntraObjectIdSid.ps1" download>
+              Last ned PowerShell-script
+            </a>
+            <button class="secondary-button light" id="copy-powershell-button" type="button">Kopier kode</button>
+          </div>
+          <a class="learn-link" href="https://learn.microsoft.com/en-us/surface-hub/surface-hub-2s-nonglobal-admin" target="_blank" rel="noopener noreferrer">
+            Se Microsofts eksempel på Microsoft Learn <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+        <div class="code-card">
+          <div class="code-toolbar">
+            <span>Convert-EntraObjectIdSid.ps1</span>
+            <span>PowerShell</span>
+          </div>
+          <pre><code id="powershell-code">function Convert-EntraObjectIdToSid {
+    param([Parameter(Mandatory)][string]$ObjectId)
+
+    $values = [UInt32[]]::new(4)
+    $bytes  = [Guid]::Parse($ObjectId).ToByteArray()
+    [Buffer]::BlockCopy($bytes, 0, $values, 0, 16)
+
+    "S-1-12-1-{0}-{1}-{2}-{3}" -f $values
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="coffee-section">
+      <div class="container">
+        <div class="coffee-card">
+          <div class="coffee-icon" aria-hidden="true">☕</div>
+          <div class="coffee-copy">
+            <p class="eyebrow">STØTT CLOUD247</p>
+            <h2>Spander meg en kaffe</h2>
+            <p>Hvis verktøyet sparer deg litt tid, kan du støtte videre utvikling med en kaffe.</p>
+          </div>
+          <div class="coffee-action">
+            <strong>20 kr</strong>
+            <a class="vipps-button" href="https://qr.vipps.no/box/90e4bd01-a470-474a-98fa-8b48f69b0f4e/pay-in" target="_blank" rel="noopener noreferrer">
+              Spander 20 kr med Vipps
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a href="https://cloud247.no/" class="footer-brand">
+        <img src="./assets/cloud247-logo.svg" alt="Cloud247 Technology" width="105" height="105">
+      </a>
+      <p>Et gratis Cloud247-verktøy for Microsoft Entra og Intune-administratorer.</p>
+      <span>© <span id="year"></span> Cloud247</span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
