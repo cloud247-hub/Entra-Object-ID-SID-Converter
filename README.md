@@ -15,7 +15,6 @@ En statisk Cloud247-webapp for å konvertere mellom:
 - Nedlastbart PowerShell-script for begge retninger
 - Ingen innlogging, Microsoft Graph-kall eller backend
 - Behandling skjer lokalt i nettleseren
-- Vipps-kaffeseksjon
 
 ## Teknisk prinsipp
 
@@ -33,22 +32,4 @@ Appen bruker samme byte-rekkefølge i JavaScript. Den motsatte retningen gjenopp
 - Bare SID-formatet `S-1-12-1` med fire 32-bits delverdier støttes.
 - Dette er ikke det samme som en tradisjonell on-premises Active Directory `objectSid`.
 
-## GitHub Pages
 
-Alle stier er relative og prosjektet inneholder `.nojekyll`.
-
-1. Last opp filene til et GitHub-repository.
-2. Åpne **Settings → Pages**.
-3. Velg **Deploy from a branch**.
-4. Velg `main` og `/(root)`.
-
-Legg til en `CNAME`-fil dersom appen skal bruke et eget Cloud247-subdomene.
-
-## Filer
-
-- `index.html` – brukergrensesnitt
-- `styles.css` – Cloud247-design
-- `converter-core.js` – ren konverteringslogikk
-- `app.js` – interaksjon, batch og nedlasting
-- `scripts/Convert-EntraObjectIdSid.ps1` – PowerShell-funksjoner
-- `assets/` – Cloud247-logo og ikon
